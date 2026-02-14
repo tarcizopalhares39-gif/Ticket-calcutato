@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Proj. Ticket Alimentação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-amoled: #000000;
+            --neon-blue: #00f3ff;
+            --correios-yellow: #feda00;
+            --neon-green: #39ff14;
+            --neon-alert: #ffff00;
+            --neon-red: #ff003c;
+            --panel-bg: #0a0a0a;
+            --text-main: #f0f0f0;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            /* Fundo principal do App */
+            background: linear-gradient(180deg, #5a0016 0%, var(--bg-amoled) 35%, var(--bg-amoled) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden; /* Evita rolagem durante a animação */
+        }
+
+        /* ==========================================
+           TELA DE INICIALIZAÇÃO (SPLASH SCREEN)
+           ========================================== */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-amoled);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out;
+        }
+
+        /* Degradê vermelho subindo de baixo para cima */
+        .splash-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(255,0,60,0.5) 0%, rgba(90,0,22,0.8) 40%, transparent 100%);
+            transform: translateY(100%);
+            animation: riseUp 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        /* Texto Animado da Inicialização */
+        .splash-text {
+            position: relative;
+            z-index: 10;
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, #ff003c, #feda00, #00f3ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            opacity: 0;
+            animation: textReveal 2.5s ease-out forwards 0.5s;
+        }
+
+        @keyframes riseUp {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes textReveal {
+            0% { 
+                opacity: 0; 
+                transform: scale(1.5) translateY(20px); 
+                filter: blur(15px); 
+            }
+            40% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+                filter: blur(0px); 
+                text-shadow: 0 0 40px rgba(255, 0, 60, 0.8);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+                filter: blur(0px);
+                text-shadow: 0 0 15px rgba(255, 0, 60, 0.5);
+            }
+        }
+        /* ========================================== */
+
+        /* Conteúdo Principal (Oculto inicialmente para melhorar o efeito) */
+        #main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .sys-init {
+            color: var(--neon-blue);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+            margin-bottom: 25px;
+            animation: pulse-blue 2s infinite;
+            text-align: center;
+        }
+
+        .card-wrapper {
+            background: linear-gradient(135deg, var(--neon-blue), #8a2be2, var(--neon-red), var(--correios-yellow));
+            background-size: 300% 300%;
+            padding: 2px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            animation: gradient-border 8s ease infinite;
+        }
+
+        .container {
+            background-color: var(--panel-bg);
+            border-radius: 22px;
+            padding: 35px 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bolt-icon {
+            color: var(--correios-yellow);
+            font-size: 1.6rem;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            filter: drop-shadow(0 0 8px var(--correios-yellow));
+        }
+
+        h2 {
+            margin: 0 0 25px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        .input-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 80%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid #333;
+            color: var(--text-main);
+            font-size: 2rem;
+            font-weight: 700;
+            padding: 15px;
+            border-radius: 16px;
+            outline: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--neon-blue);
+            background-color: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .info-panel {
+            width: 100%;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .days-left {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .days-highlight {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(254, 218, 0, 0.15);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(254, 218, 0, 0.3);
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            transition: all 0.5s ease;
+            line-height: 1.1;
+        }
+
+        .status-message {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-height: 22px;
+            transition: all 0.4s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .status-green {
+            color: var(--neon-green);
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+            animation: pulse-glow-green 2s infinite alternate;
+        }
+        .status-yellow {
+            color: var(--neon-alert);
+            text-shadow: 0 0 15px rgba(255, 255, 0, 0.6);
+            animation: pulse-glow-yellow 2s infinite alternate;
+        }
+        .status-red {
+            color: var(--neon-red);
+            text-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
+            animation: pulse-glow-red 0.5s infinite alternate;
+        }
+
+        @keyframes pulse-blue {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        @keyframes gradient-border {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes pulse-glow-green {
+            from { text-shadow: 0 0 5px var(--neon-green); }
+            to { text-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+        }
+        @keyframes pulse-glow-yellow {
+            from { text-shadow: 0 0 5px var(--neon-alert); }
+            to { text-shadow: 0 0 20px var(--neon-alert), 0 0 30px var(--neon-alert); }
+        }
+        @keyframes pulse-glow-red {
+            from { text-shadow: 0 0 5px var(--neon-red); transform: scale(1); }
+            to { text-shadow: 0 0 20px var(--neon-red), 0 0 35px var(--neon-red); transform: scale(1.03); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-gradient"></div>
+        <div class="splash-text">TICKET<br>ALIMENTAÇÃO</div>
+    </div>
+
+    <div id="main-content">
+        <div class="sys-init">>> system Initialization...</div>
+
+        <div class="card-wrapper">
+            <div class="container">
+                <div class="bolt-icon">⚡</div>
+                <h2>Projeção Diária</h2>
+                
+                <div class="input-group">
+                    <label for="saldoAtual">Saldo Atual (R$)</label>
+                    <input type="number" id="saldoAtual" placeholder="0.00" step="0.01" oninput="calcularProjecao()">
+                </div>
+
+                <div class="info-panel">
+                    <div class="days-left" id="diasRestantesTexto">
+                        Dias até o dia 13: <span class="days-highlight" id="diasCount">--</span>
+                    </div>
+                    
+                    <div class="result-container">
+                        <div class="result-label">Cota Diária</div>
+                        <div class="result-value" id="valorProjetado">R$ 0,00</div>
+                        <div class="status-message" id="mensagemStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica da Tela de Inicialização
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const mainContent = document.getElementById('main-content');
+                
+                // Desaparece a tela de splash
+                splash.style.opacity = '0';
+                
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    // Mostra o conteúdo principal com uma transição subindo
+                    document.body.style.overflow = 'auto'; // Restaura rolagem se necessário
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    // Dispara o foco no input automaticamente se quiser (opcional)
+                    // document.getElementById('saldoAtual').focus();
+                }, 800); // Aguarda o tempo do fade out
+            }, 3500); // Duração total da tela de abertura
+        });
+
+        // Lógica de cálculo dos dias (Mantida)
+        function getDiasAteProximo13() {
+            const hoje = new Date();
+            let proximo13 = new Date(hoje.getFullYear(), hoje.getMonth(), 13);
+
+            if (hoje.getDate() >= 13) {
+                proximo13.setMonth(proximo13.getMonth() + 1);
+            }
+
+            const diferencaTempo = proximo13.getTime() - hoje.getTime();
+            const diferencaDias = Math.ceil(diferencaTempo / (1000 * 3600 * 24));
+            
+            return diferencaDias;
+        }
+
+        let diasRestantes = getDiasAteProximo13();
+        document.getElementById('diasCount').innerText = diasRestantes;
+
+        let animationFrameId;
+
+        function calcularProjecao() {
+            const inputElement = document.getElementById('saldoAtual');
+            const inputSaldo = inputElement.value;
+            const saldo = parseFloat(inputSaldo);
+            const displayValor = document.getElementById('valorProjetado');
+            const displayMensagem = document.getElementById('mensagemStatus');
+
+            localStorage.setItem('ticketSaldoSalvo', inputSaldo);
+
+            if (isNaN(saldo) || saldo <= 0) {
+                displayValor.innerText = "R$ 0,00";
+                displayValor.className = "result-value"; 
+                displayMensagem.innerText = "";
+                displayMensagem.className = "status-message";
+                return;
+            }
+
+            const valorDiario = saldo / diasRestantes;
+            
+            let classeCor = "";
+            let frase = "";
+
+            if (valorDiario >= 50) {
+                classeCor = "status-green";
+                frase = "Ótimo saldo para uso diário!";
+            } else if (valorDiario >= 35 && valorDiario < 50) {
+                classeCor = "status-yellow";
+                frase = "Evite gastos não essenciais!";
+            } else {
+                classeCor = "status-red";
+                frase = "Economize para não faltar até o dia 13!";
+            }
+
+            displayMensagem.innerText = frase;
+            displayMensagem.className = `status-message ${classeCor}`;
+
+            animarNumeros(displayValor, valorDiario, classeCor);
+        }
+
+        function animarNumeros(elemento, valorFinal, classeCor) {
+            let startTimestamp = null;
+            const duration = 800; 
+            const valorInicial = 0;
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            elemento.className = `result-value ${classeCor}`;
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                
+                const easeOutProgress = progress * (2 - progress);
+                const valorAtual = valorInicial + (valorFinal - valorInicial) * easeOutProgress;
+
+                elemento.innerText = `R$ ${valorAtual.toFixed(2).replace('.', ',')}`;
+
+                if (progress < 1) {
+                    animationFrameId = requestAnimationFrame(step);
+                } else {
+                    elemento.innerText = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                }
+            };
+
+            animationFrameId = requestAnimationFrame(step);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saldoGuardado = localStorage.getItem('ticketSaldoSalvo');
+            
+            if (saldoGuardado) {
+                document.getElementById('saldoAtual').value = saldoGuardado;
+                calcularProjecao();
+            }
+        });
+    </script>
+</body>
+</html>

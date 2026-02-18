@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Proj. Ticket Alimentação - Multi-Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-amoled: #000000;
+            --neon-blue: #00f3ff;
+            --correios-yellow: #feda00;
+            --neon-green: #39ff14;
+            --neon-alert: #ffff00;
+            --neon-red: #ff003c;
+            --panel-bg: #0d0d0d; /* Um pouco mais claro que o fundo para contraste */
+            --text-main: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --dark-blue: #001a4d;
+            --deep-blue: #002288;
+        }
+
+        body {
+            /* Fundo degradê azul escuro até a metade, depois AMOLED */
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--bg-amoled) 50%, var(--bg-amoled) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* SPLASH SCREEN MANTIDA */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-amoled);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .splash-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0,85,255,0.5) 0%, rgba(0,26,77,0.8) 40%, transparent 100%);
+            transform: translateY(100%);
+            animation: riseUp 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        .splash-text {
+            position: relative;
+            z-index: 10;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, var(--deep-blue), var(--correios-yellow), var(--neon-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            opacity: 0;
+            animation: textReveal 2.5s ease-out forwards 0.5s;
+        }
+
+        @keyframes riseUp { 0% { transform: translateY(100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes textReveal {
+            0% { opacity: 0; transform: scale(1.5) translateY(20px); filter: blur(15px); }
+            40% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 40px rgba(0, 85, 255, 0.8); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 15px rgba(0, 85, 255, 0.5); }
+        }
+
+        /* CONTEÚDO EM CARDS */
+        #main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease-out;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-top: 40px;
+        }
+
+        .sys-init {
+            color: var(--neon-blue);
+            font-size: 0.8rem;
+            text-align: center;
+            animation: pulse-blue 2s infinite;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo Base dos Cards */
+        .card {
+            background-color: var(--panel-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Card de Input com a borda animada */
+        .card-input {
+            border: none;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--neon-blue), #8a2be2, var(--correios-yellow));
+            background-size: 300% 300%;
+            animation: gradient-border 8s ease infinite;
+        }
+        
+        .card-inner {
+            background: var(--panel-bg);
+            border-radius: 18px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .input-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 90%;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid var(--neon-blue);
+            color: var(--text-main);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 10px 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Card de Dias */
+        .card-days {
+            text-align: center;
+            border-left: 4px solid var(--correios-yellow);
+        }
+
+        .days-highlight {
+            color: var(--correios-yellow);
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+
+        /* Card de Resultado */
+        .card-result {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            min-height: 150px;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* ANIMAÇÕES DE STATUS PRESERVADAS */
+        .status-green { color: var(--neon-green); text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        .status-yellow { color: var(--neon-alert); text-shadow: 0 0 15px rgba(255, 255, 0, 0.4); }
+        .status-red { color: var(--neon-red); text-shadow: 0 0 15px rgba(255, 0, 60, 0.4); animation: pulse-glow-red 0.5s infinite alternate; }
+
+        @keyframes pulse-blue { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes gradient-border { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes pulse-glow-red { from { transform: scale(1); } to { transform: scale(1.02); } }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-gradient"></div>
+        <div class="splash-text">TICKET<br>ALIMENTAÇÃO</div>
+    </div>
+
+    <div id="main-content">
+        <div class="sys-init">>> PROJECTION SYSTEM READY</div>
+
+        <div class="card card-input">
+            <div class="card-inner">
+                <h2>Saldo Disponível</h2>
+                <div class="input-wrapper">
+                    <input type="number" id="saldoAtual" placeholder="0,00" step="0.01" oninput="calcularProjecao()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-days">
+            <span>Ciclo encerra em: </span>
+            <span class="days-highlight" id="diasCount">--</span> dias (Dia 13)
+        </div>
+
+        <div class="card card-result">
+            <div class="result-label">Cota Diária Projetada</div>
+            <div class="result-value" id="valorProjetado">R$ 0,00</div>
+            <div class="status-message" id="mensagemStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica da Tela de Inicialização
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const mainContent = document.getElementById('main-content');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                }, 800);
+            }, 3000);
+        });
+
+        // Lógica de cálculo dos dias
+        function getDiasAteProximo13() {
+            const hoje = new Date();
+            let proximo13 = new Date(hoje.getFullYear(), hoje.getMonth(), 13);
+            if (hoje.getDate() >= 13) {
+                proximo13.setMonth(proximo13.getMonth() + 1);
+            }
+            const diferencaTempo = proximo13.getTime() - hoje.getTime();
+            return Math.ceil(diferencaTempo / (1000 * 3600 * 24));
+        }
+
+        let diasRestantes = getDiasAteProximo13();
+        document.getElementById('diasCount').innerText = diasRestantes;
+
+        let animationFrameId;
+
+        function calcularProjecao() {
+            const inputElement = document.getElementById('saldoAtual');
+            const inputSaldo = inputElement.value;
+            const saldo = parseFloat(inputSaldo);
+            const displayValor = document.getElementById('valorProjetado');
+            const displayMensagem = document.getElementById('mensagemStatus');
+
+            localStorage.setItem('ticketSaldoSalvo', inputSaldo);
+
+            if (isNaN(saldo) || saldo <= 0) {
+                displayValor.innerText = "R$ 0,00";
+                displayValor.className = "result-value"; 
+                displayMensagem.innerText = "";
+                return;
+            }
+
+            const valorDiario = saldo / diasRestantes;
+            
+            let classeCor = "";
+            let frase = "";
+
+            if (valorDiario >= 50) {
+                classeCor = "status-green";
+                frase = "ÓTIMO SALDO DISPONÍVEL";
+            } else if (valorDiario >= 35 && valorDiario < 50) {
+                classeCor = "status-yellow";
+                frase = "MODERE OS GASTOS EXTRAS";
+            } else {
+                classeCor = "status-red";
+                frase = "ALERTA: ECONOMIA CRÍTICA";
+            }
+
+            displayMensagem.innerText = frase;
+            displayMensagem.className = `status-message ${classeCor}`;
+
+            animarNumeros(displayValor, valorDiario, classeCor);
+        }
+
+        // ANIMAÇÃO DOS NÚMEROS PRESERVADA
+        function animarNumeros(elemento, valorFinal, classeCor) {
+            let startTimestamp = null;
+            const duration = 800; 
+            const valorInicial = 0;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            elemento.className = `result-value ${classeCor}`;
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOutProgress = progress * (2 - progress);
+                const valorAtual = valorInicial + (valorFinal - valorInicial) * easeOutProgress;
+                elemento.innerText = `R$ ${valorAtual.toFixed(2).replace('.', ',')}`;
+                if (progress < 1) {
+                    animationFrameId = requestAnimationFrame(step);
+                } else {
+                    elemento.innerText = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                }
+            };
+            animationFrameId = requestAnimationFrame(step);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saldoGuardado = localStorage.getItem('ticketSaldoSalvo');
+            if (saldoGuardado) {
+                document.getElementById('saldoAtual').value = saldoGuardado;
+                calcularProjecao();
+            }
+        });
+    </script>
+</body>
+</html>
